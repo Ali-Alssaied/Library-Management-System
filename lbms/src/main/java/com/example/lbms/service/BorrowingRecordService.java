@@ -30,7 +30,8 @@ public class BorrowingRecordService {
 
     @Transactional
         public ResponseEntity<BorrowingDto> addNewBorrowingAction(int bookId , int patronId) throws Exception {
-
+        ResponseEntity<BorrowingDto> response = ResponseEntity.notFound().build();
+        boolean isborrowed = false;
             Book book = bookRepo.findById(bookId)
                     .orElseThrow(() -> new Exception("Book not found with ID: " + bookId));
 
@@ -41,8 +42,25 @@ public class BorrowingRecordService {
                 borrowingDto.setBookId(book.getId());
                 borrowingDto.setPartonId(patron.getId());
                 borrowingDto.setBorrowingDate(new Date(System.currentTimeMillis()));
-                return ResponseEntity.ok(borrowingDto.toDto(borrowingRepo.save(BorrowingRecord.toEntity(borrowingDto))));
+
+        ArrayList<BorrowingDto> blist= getAllBorrowings();
+        for (BorrowingDto bor : blist) {
+
+            if ((bor.getBookId() == bookId) && (bor.getReturnDate() == null)) //check if already borrowed
+            {
+                isborrowed=true;
+                break;
             }
+
+        }
+        if (isborrowed) {
+            response = ResponseEntity.notFound().build();
+        }
+        else
+            response= ResponseEntity.ok(borrowingDto.toDto(borrowingRepo.save(BorrowingRecord.toEntity(borrowingDto))));
+
+        return response;
+    }
     @Transactional
     public ResponseEntity<BorrowingDto> returnBorrowingAction(int bookId , int patronId) throws Exception {
         ResponseEntity<BorrowingDto> response = ResponseEntity.notFound().build();
@@ -95,5 +113,13 @@ public class BorrowingRecordService {
             }
             return borrowingDto;
         }
+    public BorrowingDto getBorrowingByID(Integer id){
+        Optional<BorrowingRecord> br = borrowingRepo.findById(id);
+        if (br.isPresent()) {
+            return BorrowingDto.toDto(br.get());
+        }
+        else
+            return null;
 
+    }
 }

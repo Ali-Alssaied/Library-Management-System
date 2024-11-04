@@ -31,7 +31,7 @@ public class BookService {
         bookRepo.deleteById(id);
 
     }
-    @Cacheable(value = "books")
+
     public ArrayList<BookDto> getAllBooks()
     {
         ArrayList<BookDto> books = new ArrayList<>();
@@ -43,7 +43,7 @@ public class BookService {
         }
         return books;
     }
-    @Cacheable(value = "books", key = "#id")
+
     public BookDto getBookByID(Integer id){
         Optional<Book> book = bookRepo.findById(id);
         if (book.isPresent()) {

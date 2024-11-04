@@ -32,7 +32,7 @@ public class PartonService {
 
     }
 
-    @Cacheable(value = "patrons")
+
     public ArrayList<PatronDto> getAllPatrons()
     {
         ArrayList<PatronDto> patron = new ArrayList<>();
@@ -44,7 +44,7 @@ public class PartonService {
         }
         return patron;
     }
-    @Cacheable(value = "patrons", key = "#id")
+
     public ResponseEntity<PatronDto> getPatronByID(Integer id){
         Optional<Patron> pat = patronRepo.findById(id);
         if (pat.isPresent()) {
